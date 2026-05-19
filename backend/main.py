@@ -70,6 +70,50 @@ def chat(req: ChatRequest):
     )
 
 
+@app.post("/chat/audio", response_model=ChatResponse)
+async def chat_audio(
+    file: UploadFile = File(...),
+    session_id: str = Form(...),
+    mode: str = Form(default="text"),
+):
+    import io
+    from openai import OpenAI
+
+    try:
+        audio_data = await file.read()
+        audio_file = io.BytesIO(audio_data)
+        audio_file.name = file.filename or "audio.webm"
+
+        client = OpenAI()
+        transcript = client.audio.transcriptions.create(
+            model="whisper-1",
+            file=audio_file,
+        )
+        message = transcript.text.strip()
+        if not message:
+            raise HTTPException(status_code=400, detail="Could not transcribe audio.")
+
+        result = run_agent(message, session_id)
+
+        audio_b64 = None
+        if mode == "voice":
+            try:
+                audio_b64 = text_to_speech(result["response"])
+            except Exception as e:
+                print(f"TTS error: {e}")
+
+        return ChatResponse(
+            response=result["response"],
+            tool_used=result["tool_used"],
+            tool_name=result["tool_name"],
+            audio_b64=audio_b64,
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/rag/init")
 def rag_init():
     try:
