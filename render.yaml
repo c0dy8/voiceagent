@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: chefbot-backend
+    runtime: python
+    pythonVersion: 3.11
+
+    # Build configuration
+    buildCommand: cd backend && pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+
+    # Environment variables
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: RAG_SOURCE_URL
+        value: https://en.wikipedia.org/wiki/Cooking
+
+    # Persistent disk for ChromaDB
+    disk:
+      name: chroma-db
+      mountPath: /backend/chroma_db
+      sizeGB: 1
+
+    # Auto-deploy on push
+    autoDeploy: true
+
+    # Health check
+    healthCheckPath: /health
+    healthCheckInterval: 600
+
+    # Maximum concurrent requests
+    maxInstance: 1
+    minInstance: 1
+
+databases:
+  # Optional: Add Postgres for session persistence in future
+  # - name: chefbot-db
+  #   databaseName: chefbot
+  #   user: chefbot
+  #   plan: free
