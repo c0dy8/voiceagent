@@ -1,49 +1,38 @@
 services:
+  # ── Backend ────────────────────────────────────────────
   - type: web
     name: chefbot-backend
     runtime: python
-    pythonVersion: 3.11
-
-    # Build configuration
-    buildCommand: cd backend && pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
-
-    # Environment variables
+    pythonVersion: "3.11"
+    rootDir: backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: OPENAI_API_KEY
         sync: false
       - key: RAG_SOURCE_URL
         value: https://en.wikipedia.org/wiki/Cooking
-
-    # Persistent disk for ChromaDB
+      - key: FRONTEND_URL
+        value: https://chefbot-frontend.onrender.com
     disk:
       name: chroma-db
-      mountPath: /backend/chroma_db
+      mountPath: /opt/render/project/src/chroma_db
       sizeGB: 1
-
-    # Auto-deploy on push
+    healthCheckPath: /health
     autoDeploy: true
 
-    # Health check
-    healthCheckPath: /health
-    healthCheckInterval: 600
-
-    # Maximum concurrent requests
-    maxInstance: 1
-    minInstance: 1
-
+  # ── Frontend ───────────────────────────────────────────
   - type: web
     name: chefbot-frontend
     runtime: static
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         value: https://chefbot-backend.onrender.com
-
-databases:
-  # Optional: Add Postgres for session persistence in future
-  # - name: chefbot-db
-  #   databaseName: chefbot
-  #   user: chefbot
-  #   plan: free
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    autoDeploy: true
