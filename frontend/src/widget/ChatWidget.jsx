@@ -26,7 +26,7 @@ const formatResponse = (text) => {
 };
 
 export function ChatWidget({ open, onClose, firstOpen }) {
-  const { messages, mode, setMode, isLoading, sendMessage } = useChat();
+  const { messages, mode, setMode, isLoading, sendMessage, addAudioExchange, SESSION_ID } = useChat();
   const { isRecording, isSending, recordAndSend } = useAudioRecorder();
   const [input, setInput] = useState("");
   const [isClosing, setIsClosing] = useState(false);
@@ -72,14 +72,19 @@ export function ChatWidget({ open, onClose, firstOpen }) {
 
   const handleAudioRecord = () => {
     recordAndSend(
-      Date.now().toString(),
+      SESSION_ID,
       mode,
       (response) => {
-        sendMessage(response.response);
+        addAudioExchange(response.transcribed_text || "🎤 (voice message)", response);
       },
       (error) => {
         console.error("Audio error:", error);
-        alert("Error al procesar el audio: " + error.message);
+        addAudioExchange("🎤 (voice message)", {
+          response: "Sorry, I couldn't process the audio: " + error.message,
+          tool_used: null,
+          tool_name: null,
+          audio_b64: null,
+        });
       }
     );
   };

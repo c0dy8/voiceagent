@@ -63,5 +63,22 @@ export function useChat() {
     [mode, isLoading]
   );
 
-  return { messages, mode, setMode, isLoading, sendMessage };
+  const addAudioExchange = useCallback((transcribedText, apiResponse) => {
+    const userMsg = { role: "user", content: transcribedText, id: Date.now() };
+    const botMsg = {
+      role: "assistant",
+      content: apiResponse.response,
+      tool_used: apiResponse.tool_used,
+      tool_name: apiResponse.tool_name,
+      id: Date.now() + 1,
+    };
+    setMessages((prev) => [...prev, userMsg, botMsg]);
+
+    if (mode === "voice" && apiResponse.audio_b64) {
+      const audio = new Audio(`data:audio/mpeg;base64,${apiResponse.audio_b64}`);
+      audio.play().catch(console.error);
+    }
+  }, [mode]);
+
+  return { messages, mode, setMode, isLoading, sendMessage, addAudioExchange, SESSION_ID };
 }

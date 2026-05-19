@@ -35,6 +35,7 @@ class ChatResponse(BaseModel):
     tool_used: str | None = None
     tool_name: str | None = None
     audio_b64: str | None = None
+    transcribed_text: str | None = None
 
 
 @app.get("/")
@@ -107,6 +108,7 @@ async def chat_audio(
             tool_used=result["tool_used"],
             tool_name=result["tool_name"],
             audio_b64=audio_b64,
+            transcribed_text=message,
         )
     except HTTPException:
         raise
