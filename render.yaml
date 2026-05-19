@@ -38,3 +38,13 @@ databases:
   #   databaseName: chefbot
   #   user: chefbot
   #   plan: free
+
+staticSites:
+  - type: static
+    name: chefbot-frontend
+    env: node
+    buildCommand: cd frontend && npm install && npm run build
+    publishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://chefbot-backend.onrender.com

@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function generateSessionId() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);

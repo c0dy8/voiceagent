@@ -212,12 +212,21 @@ Create a `.env` file in `voiceagent/backend/` with:
 ```env
 OPENAI_API_KEY=sk-proj-...your-key-here...
 RAG_SOURCE_URL=https://en.wikipedia.org/wiki/Cooking
+ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+```
+
+Create a `.env` file in `voiceagent/frontend/` with:
+
+```env
+VITE_API_URL=http://localhost:8000
 ```
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
 | `OPENAI_API_KEY` | OpenAI API key (GPT-4o-mini, Whisper, TTS-1, embeddings) | Yes | — |
 | `RAG_SOURCE_URL` | URL to scrape for RAG knowledge base | No | Wikipedia Cooking |
+| `ALLOWED_ORIGINS` | Comma-separated frontend origins allowed by CORS | No | `http://localhost:5173,http://127.0.0.1:5173` |
+| `VITE_API_URL` | Backend API URL used by the frontend | No | `http://localhost:8000` |
 
 ### Getting an OpenAI API Key
 

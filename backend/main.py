@@ -13,9 +13,15 @@ from tts import text_to_speech
 
 app = FastAPI(title="ChefBot API")
 
+allowed_origins = os.getenv("ALLOWED_ORIGINS")
+if allowed_origins:
+    origins = [origin.strip() for origin in allowed_origins.split(",") if origin.strip()]
+else:
+    origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

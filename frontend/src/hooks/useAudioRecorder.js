@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 export function useAudioRecorder() {
   const [isRecording, setIsRecording] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -53,7 +55,7 @@ export function useAudioRecorder() {
         formData.append("session_id", sessionId);
         formData.append("mode", mode);
 
-        const response = await fetch("http://localhost:8000/chat/audio", {
+        const response = await fetch(`${API_URL}/chat/audio`, {
           method: "POST",
           body: formData,
         });
