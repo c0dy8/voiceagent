@@ -32,19 +32,19 @@ services:
     maxInstance: 1
     minInstance: 1
 
-databases:
-  # Optional: Add Postgres for session persistence in future
-  # - name: chefbot-db
-  #   databaseName: chefbot
-  #   user: chefbot
-  #   plan: free
-
-staticSites:
-  - type: static
+  - type: web
     name: chefbot-frontend
+    runtime: static
     env: node
     buildCommand: cd frontend && npm install && npm run build
     publishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
         value: https://chefbot-backend.onrender.com
+
+databases:
+  # Optional: Add Postgres for session persistence in future
+  # - name: chefbot-db
+  #   databaseName: chefbot
+  #   user: chefbot
+  #   plan: free
